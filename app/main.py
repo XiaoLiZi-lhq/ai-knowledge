@@ -79,6 +79,13 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         console.print(f"[red]ChromaDB 初始化失败: {e}[/red]")
 
+    # 初始化 SQLite 数据库
+    try:
+        from scripts.init_db import init_database
+        init_database()
+    except Exception as e:
+        console.print(f"[yellow]SQLite 初始化跳过: {e}[/yellow]")
+
     # 配置定时任务
     scheduler.add_job(
         daily_github_collect,

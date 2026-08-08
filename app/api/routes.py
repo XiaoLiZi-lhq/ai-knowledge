@@ -3,7 +3,7 @@ AI Knowledge Hub - API 路由
 所有 REST API 端点
 """
 
-from fastapi import APIRouter, Header, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Header, HTTPException, BackgroundTasks, Depends
 from pydantic import BaseModel
 from typing import Optional
 from app.config import settings
@@ -162,7 +162,3 @@ async def wechat_message(msg: WeChatMessage, auth: bool = Depends(verify_api_key
     """接收微信消息并返回回复（供微信桥接服务调用）"""
     reply = wechat_router.handle_message(msg.message, msg.sender)
     return {"reply": reply}
-
-
-# 修复：补充 import
-from fastapi import Depends
