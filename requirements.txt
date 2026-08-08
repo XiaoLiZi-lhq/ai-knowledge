@@ -1,0 +1,28 @@
+# ====================================
+# AI Knowledge Hub - Python 依赖
+# ====================================
+
+# Web 框架
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-dotenv==1.0.1
+
+# AI / LLM
+openai==1.59.7           # OpenAI兼容接口（Ollama和DeepSeek都用这个）
+chromadb==0.5.23         # 向量数据库
+sentence-transformers==3.3.1  # 嵌入模型备用
+
+# 数据处理
+beautifulsoup4==4.12.3   # HTML解析
+httpx==0.28.1            # 异步HTTP（GitHub抓取）
+pyyaml==6.0.2            # 配置文件
+
+# 定时任务
+apscheduler==3.11.0
+
+# 工具
+python-frontmatter==1.1.0  # Markdown frontmatter解析
+rich==13.9.4              # 终端美化输出
+
+# 微信接入（Windows环境用wcferry，Mac用备选方案）
+# wcferry==39.0.10  # Windows only
