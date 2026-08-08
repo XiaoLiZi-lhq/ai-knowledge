@@ -1,0 +1,33 @@
+# 环境变量
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# 数据
+data/chroma/
+data/sqlite/
+
+# Obsidian Vault（不在项目仓库中）
+MyVault/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+logs/
