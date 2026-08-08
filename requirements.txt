@@ -11,6 +11,7 @@ python-dotenv==1.0.1
 openai==1.59.7           # OpenAI兼容接口（Ollama和DeepSeek都用这个）
 chromadb==0.5.23         # 向量数据库
 sentence-transformers==3.3.1  # 嵌入模型备用
+jieba==0.42.1            # 中文分词（本地嵌入引擎依赖）
 
 # 数据处理
 beautifulsoup4==4.12.3   # HTML解析

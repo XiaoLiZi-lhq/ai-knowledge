@@ -54,26 +54,67 @@ class QuizGenerator:
 笔记内容：
 {context}
 
-要求：
-- 题目必须基于笔记内容，不要编造
-- 难度适中，考察理解而非记忆
-- 输出 JSON 格式：
-{{"questions": [{{"type": "choice|short_answer|code", "question": "题目", "options": ["A选项","B选项","C选项","D选项"], "answer": "正确答案", "explanation": "解析"}}]}}
+输出要求：
+- 严格输出 JSON，不要有多余文字
+- 选择题格式: type="choice", options=["A选项","B选项","C选项","D选项"], answer="正确选项字母"
+- 简答题格式: type="short_answer", options=[], answer="参考答案"
+- explanation 不超过30字
+- JSON结构: {{"questions":[{{"type":"","question":"","options":[],"answer":"","explanation":""}}]}}
 
-只输出 JSON。"""
+只输出JSON："""
 
         result = llm_service.chat(
             [{"role": "user", "content": prompt}],
             temperature=0.5,
-            max_tokens=2000,
+            max_tokens=4000,
         )
 
         try:
-            result = result.strip().strip("```json").strip("```").strip()
-            data = json.loads(result)
+            # 清理 markdown 代码块标记
+            cleaned = result.strip()
+            if cleaned.startswith("```"):
+                cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned[3:]
+            if cleaned.endswith("```"):
+                cleaned = cleaned.rsplit("```", 1)[0]
+            cleaned = cleaned.strip()
+
+            # 尝试找到完整的 JSON 对象
+            brace_start = cleaned.find("{")
+            brace_end = cleaned.rfind("}")
+            if brace_start >= 0 and brace_end > brace_start:
+                cleaned = cleaned[brace_start:brace_end + 1]
+
+            # 修复 LLM 常见的 JSON 格式问题：未转义的换行符
+            # 只在字符串值内部替换裸换行（在引号之间的 \n）
+            import re
+            def fix_newlines_in_strings(text):
+                """将 JSON 字符串值中的裸换行符替换为 \\n"""
+                result_chars = []
+                in_string = False
+                escape = False
+                for ch in text:
+                    if escape:
+                        result_chars.append(ch)
+                        escape = False
+                    elif ch == "\\":
+                        result_chars.append(ch)
+                        escape = True
+                    elif ch == '"':
+                        result_chars.append(ch)
+                        in_string = not in_string
+                    elif ch == '\n' and in_string:
+                        result_chars.append('\\n')
+                    else:
+                        result_chars.append(ch)
+                return ''.join(result_chars)
+
+            cleaned = fix_newlines_in_strings(cleaned)
+            data = json.loads(cleaned)
             self._log_quiz(topic, len(data.get("questions", [])))
             return data
-        except Exception:
+        except json.JSONDecodeError as e:
+            return {"error": "题目生成失败，请重试", "raw": result[:500], "parse_error": str(e), "cleaned_head": cleaned[:200]}
+        except Exception as e:
             return {"error": "题目生成失败，请重试", "raw": result[:500]}
 
     def submit(self, answers: list[dict]) -> dict:
@@ -97,13 +138,16 @@ class QuizGenerator:
 
     def _log_quiz(self, topic: str, count: int):
         """记录测验日志"""
-        conn = sqlite3.connect(settings.SQLITE_PATH)
-        conn.execute(
-            "INSERT INTO learning_log (date, activity, topic, score) VALUES (?, 'quiz', ?, NULL)",
-            (date.today().isoformat(), topic or "general"),
-        )
-        conn.commit()
-        conn.close()
+        try:
+            conn = sqlite3.connect(settings.SQLITE_PATH)
+            conn.execute(
+                "INSERT INTO learning_log (date, activity, topic, score) VALUES (?, 'quiz', ?, NULL)",
+                (date.today().isoformat(), topic or "general"),
+            )
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass  # 表不存在时静默跳过，不影响主流程
 
 
 class GapScanner:
@@ -287,8 +331,41 @@ class PlanGenerator:
         )
 
         try:
-            result = result.strip().strip("```json").strip("```").strip()
-            plan = json.loads(result)
+            cleaned = result.strip()
+            if cleaned.startswith("```"):
+                cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned[3:]
+            if cleaned.endswith("```"):
+                cleaned = cleaned.rsplit("```", 1)[0]
+            cleaned = cleaned.strip()
+
+            brace_start = cleaned.find("{")
+            brace_end = cleaned.rfind("}")
+            if brace_start >= 0 and brace_end > brace_start:
+                cleaned = cleaned[brace_start:brace_end + 1]
+
+            # 修复未转义换行符
+            def fix_newlines_in_strings(text):
+                result_chars = []
+                in_string = False
+                escape = False
+                for ch in text:
+                    if escape:
+                        result_chars.append(ch)
+                        escape = False
+                    elif ch == "\\":
+                        result_chars.append(ch)
+                        escape = True
+                    elif ch == '"':
+                        result_chars.append(ch)
+                        in_string = not in_string
+                    elif ch == '\n' and in_string:
+                        result_chars.append('\\n')
+                    else:
+                        result_chars.append(ch)
+                return ''.join(result_chars)
+
+            cleaned = fix_newlines_in_strings(cleaned)
+            plan = json.loads(cleaned)
 
             # 保存到 SQLite
             self._save_plan(plan)
@@ -302,20 +379,23 @@ class PlanGenerator:
 
     def _save_plan(self, plan: dict):
         """保存到 SQLite"""
-        conn = sqlite3.connect(settings.SQLITE_PATH)
-        conn.execute(
-            """INSERT INTO study_plans (title, start_date, end_date, goal, tasks, status)
-            VALUES (?, ?, ?, ?, ?, 'active')""",
-            (
-                plan.get("title", "学习计划"),
-                plan.get("start_date", date.today().isoformat()),
-                plan.get("end_date", ""),
-                plan.get("goal", ""),
-                json.dumps(plan, ensure_ascii=False),
-            ),
-        )
-        conn.commit()
-        conn.close()
+        try:
+            conn = sqlite3.connect(settings.SQLITE_PATH)
+            conn.execute(
+                """INSERT INTO study_plans (title, start_date, end_date, goal, tasks, status)
+                VALUES (?, ?, ?, ?, ?, 'active')""",
+                (
+                    plan.get("title", "学习计划"),
+                    plan.get("start_date", date.today().isoformat()),
+                    plan.get("end_date", ""),
+                    plan.get("goal", ""),
+                    json.dumps(plan, ensure_ascii=False),
+                ),
+            )
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass  # 表不存在时静默跳过
 
     def _write_plan_md(self, plan: dict):
         """写入 Vault"""
