@@ -71,11 +71,13 @@ class RAGPipeline:
         count = 0
         md_files = list(vault_path.rglob("*.md"))
 
-        # 排除模板和配置目录
-        exclude_dirs = {".obsidian", "03-Templates", "99-Archive"}
+        # 排除模板、配置目录，以及代码项目目录（node_modules 等巨型 changelog 会撑爆 embedding 上下文/超时降级，导致维度混仓）
+        exclude_dirs = {".obsidian", "03-Templates", "99-Archive", "node_modules", "redis-learn"}
+        exclude_names = {"CHANGELOG.md", "CHANGES.md", "LICENSE.md", "CODE_OF_CONDUCT.md"}
         md_files = [
             f for f in md_files
             if not any(d in f.parts for d in exclude_dirs)
+            and f.name not in exclude_names
         ]
 
         for md_file in md_files:

@@ -19,6 +19,7 @@ class LLMService:
         self._deepseek_client: Optional[OpenAI] = None
         self._ollama_available = False
         self._st_model = None
+        self._st_failed = False  # sentence-transformers 失败标记（网络不通时避免每次调用重复超时）
 
     @property
     def ollama_client(self) -> OpenAI:
@@ -153,19 +154,29 @@ class LLMService:
 
         raise RuntimeError("所有 LLM 后端均不可用")
 
+    # nomic-embed-text 上下文 8192 token；按「1 汉字≈1 token、1 英文单词≈1.3 token」保守截断
+    EMBED_MAX_CHARS = 6000
+
+    def _truncate_for_embed(self, text: str) -> str:
+        if len(text) <= self.EMBED_MAX_CHARS:
+            return text
+        return text[: self.EMBED_MAX_CHARS]
+
     def embed(self, texts: list[str]) -> list[list[float]]:
         """
         生成文本嵌入向量
         三级降级策略：
-        1. Ollama nomic-embed-text（最佳，需本地有模型）
-        2. sentence-transformers BAAI/bge-small-zh-v1.5（需可下载模型）
+        1. Ollama nomic-embed-text（批量端点 /api/embed，超长文本截断）
+        2. sentence-transformers BAAI/bge-small-zh-v1.5（需可下载模型；失败一次后熔断）
         3. 本地哈希向量引擎（零依赖兜底）
+        返回条数恒等于输入条数；任一条失败即整体抛错交给上层降级，绝不静默丢条错位
         """
-        # 第一优先级：Ollama embedding
+        texts = [self._truncate_for_embed(t) for t in texts]
+
+        # 第一优先级：Ollama embedding（批量）
         if self.check_ollama():
             try:
                 base = self._get_ollama_base()
-                # 先检查 embedding 模型是否已安装
                 tags_resp = httpx.get(f"{base}/api/tags", timeout=5)
                 installed_models = [
                     m.get("name", "") for m in tags_resp.json().get("models", [])
@@ -173,28 +184,29 @@ class LLMService:
                 embed_model = settings.OLLAMA_EMBED_MODEL
 
                 if any(embed_model in m for m in installed_models):
-                    embeddings = []
-                    for text in texts:
-                        resp = httpx.post(
-                            f"{base}/api/embeddings",
-                            json={
-                                "model": embed_model,
-                                "prompt": text,
-                            },
-                            timeout=30,
-                        )
-                        data = resp.json()
-                        if "embedding" in data:
-                            embeddings.append(data["embedding"])
-                    if embeddings:
+                    resp = httpx.post(
+                        f"{base}/api/embed",
+                        json={"model": embed_model, "input": texts},
+                        timeout=120,
+                    )
+                    data = resp.json()
+                    embeddings = data.get("embeddings", [])
+                    if len(embeddings) == len(texts) and all(embeddings):
                         return embeddings
+                    # 数量不齐或维度异常 → 视为本级失败，走降级
+                    raise RuntimeError(
+                        f"ollama embed 返回不完整: 期望 {len(texts)} 条, 实得 {len(embeddings)} 条"
+                    )
             except Exception:
                 pass
 
-        # 第二优先级：sentence-transformers
-        try:
-            return self._embed_with_st(texts)
-        except Exception:
+        # 第二优先级：sentence-transformers（失败一次后缓存，避免每次调用重复超时/下载）
+        if not self._st_failed:
+            try:
+                return self._embed_with_st(texts)
+            except Exception:
+                self._st_failed = True
+        else:
             pass
 
         # 第三优先级：本地哈希向量（零依赖兜底）
