@@ -29,6 +29,9 @@ class Settings:
     # --- Obsidian Vault ---
     VAULT_PATH: str = os.getenv("VAULT_PATH", str(Path.home() / "Documents" / "MyVault"))
 
+    # --- 桌面投递箱 ---
+    INBOX_PATH: str = os.getenv("INBOX_PATH", str(Path.home() / "Desktop" / "LearningInbox"))
+
     # --- GitHub ---
     GITHUB_TOKEN: str = os.getenv("GITHUB_TOKEN", "")
 
@@ -50,6 +53,11 @@ class Settings:
     def vault_path_obj(self) -> Path:
         """Vault Path 对象"""
         return Path(os.path.expanduser(self.VAULT_PATH))
+
+    @property
+    def inbox_path_obj(self) -> Path:
+        """投递箱 Path 对象"""
+        return Path(os.path.expanduser(self.INBOX_PATH))
 
 
 settings = Settings()

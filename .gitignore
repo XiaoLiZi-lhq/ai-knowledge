@@ -14,6 +14,7 @@ venv/
 # 数据
 data/chroma/
 data/sqlite/
+data/inbox-processed/
 
 # Obsidian Vault（不在项目仓库中）
 MyVault/
@@ -31,3 +32,5 @@ Thumbs.db
 # 日志
 *.log
 logs/
+.tools/
+.tools/

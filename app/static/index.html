@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Knowledge Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230d9488'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E">
+</head>
+<body>
+<div class="app-layout">
+    <!-- === Sidebar === -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span>AI Knowledge Hub</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">概览</div>
+                <button class="nav-item active" data-page="dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    <span>仪表盘</span>
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">知识</div>
+                <button class="nav-item" data-page="chat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>知识问答</span>
+                </button>
+                <button class="nav-item" data-page="gaps">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                    <span>知识盲区</span>
+                </button>
+                <button class="nav-item" data-page="notes">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>
+                    <span>笔记管理</span>
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">学习</div>
+                <button class="nav-item" data-page="quiz">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/><circle cx="12" cy="12" r="10"/></svg>
+                    <span>AI 出题</span>
+                </button>
+                <button class="nav-item" data-page="plan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>学习计划</span>
+                </button>
+                <button class="nav-item" data-page="learning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                    <span>学习中心</span>
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">发现</div>
+                <button class="nav-item" data-page="github">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    <span>GitHub 趋势</span>
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">系统</div>
+                <button class="nav-item" data-page="settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>设置</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-status" id="sidebar-status">
+                <span class="status-dot degraded"></span>
+                <span>检查中...</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- === Main Content === -->
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <div class="page-title" id="page-title">仪表盘</div>
+                <div class="page-subtitle" id="page-subtitle">系统状态和概览</div>
+            </div>
+            <div id="page-actions"></div>
+        </div>
+
+        <div class="page-body">
+
+            <!-- === Dashboard === -->
+            <div class="page active" id="page-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon teal">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="stat-model">--</div>
+                            <div class="stat-label">当前模型</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="stat-ollama">--</div>
+                            <div class="stat-label">Ollama 状态</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="stat-chroma">--</div>
+                            <div class="stat-label">ChromaDB</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon amber">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="stat-notes">--</div>
+                            <div class="stat-label">笔记向量数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">快速操作</span>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <button class="btn btn-secondary" onclick="navigate('chat')" style="justify-content: center; padding: 16px;">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                    知识问答
+                                </button>
+                                <button class="btn btn-secondary" onclick="navigate('quiz')" style="justify-content: center; padding: 16px;">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/><circle cx="12" cy="12" r="10"/></svg>
+                                    AI 出题
+                                </button>
+                                <button class="btn btn-secondary" onclick="navigate('github')" style="justify-content: center; padding: 16px;">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                                    GitHub 趋势
+                                </button>
+                                <button class="btn btn-secondary" onclick="navigate('notes'); syncNotes()" style="justify-content: center; padding: 16px;">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                    同步 Vault
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">系统信息</span>
+                        </div>
+                        <div class="card-body">
+                            <div style="font-size: 0.8125rem; color: var(--color-text-secondary); line-height: 2;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Vault 路径</span>
+                                    <code style="color: var(--color-text);">~/Documents/MyVault</code>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>嵌入模型</span>
+                                    <code style="color: var(--color-text);">nomic-embed-text</code>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>RAG Top-K</span>
+                                    <code style="color: var(--color-text);">5</code>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>定时任务</span>
+                                    <code style="color: var(--color-text);">08:00 / 02:00</code>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>备用 LLM</span>
+                                    <code style="color: var(--color-text);">DeepSeek API</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === Chat === -->
+            <div class="page" id="page-chat">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="chat-empty" id="chat-empty">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <div style="font-size: 1rem; font-weight: 500; color: var(--color-text-secondary);">基于知识库的 AI 问答</div>
+                            <div style="font-size: 0.8125rem;">输入问题，AI 将从你的 Obsidian Vault 中检索相关内容并回答</div>
+                            <div class="chat-suggestions">
+                                <div class="suggestion-chip">Transformer 的注意力机制是什么？</div>
+                                <div class="suggestion-chip">RAG 的核心流程是什么？</div>
+                                <div class="suggestion-chip">解释一下梯度下降</div>
+                                <div class="suggestion-chip">CNN 和 RNN 的区别？</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <div class="chat-input-wrapper">
+                            <textarea id="chat-input" placeholder="输入你的问题... (Enter 发送, Shift+Enter 换行)" rows="1"></textarea>
+                            <button class="btn btn-primary" id="chat-send" style="height: 44px; width: 44px; padding: 0; justify-content: center;">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === GitHub === -->
+            <div class="page" id="page-github">
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                    <button class="btn btn-secondary" onclick="collectGitHub()">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        收集热点
+                    </button>
+                </div>
+                <div id="github-loading" class="empty-state">
+                    <div class="spinner"></div>
+                    <div class="empty-state-title">加载中...</div>
+                </div>
+                <div class="repo-grid" id="github-grid"></div>
+            </div>
+
+            <!-- === Quiz === -->
+            <div class="page" id="page-quiz">
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 16px; align-items: end;">
+                            <div>
+                                <label class="form-label">主题（留空=综合）</label>
+                                <input type="text" class="input" id="quiz-topic" placeholder="如：Transformer、梯度下降...">
+                            </div>
+                            <div>
+                                <label class="form-label">题量</label>
+                                <select class="input" id="quiz-count">
+                                    <option value="3">3 题</option>
+                                    <option value="5" selected>5 题</option>
+                                    <option value="10">10 题</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">题型</label>
+                                <select class="input" id="quiz-type">
+                                    <option value="mixed" selected>混合</option>
+                                    <option value="choice">选择题</option>
+                                    <option value="short_answer">简答题</option>
+                                    <option value="code">代码题</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="quiz-generate-btn">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                生成题目
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="quiz-container">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; stroke: var(--color-border);"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/><circle cx="12" cy="12" r="10"/></svg>
+                        <div class="empty-state-title">还没有题目</div>
+                        <div class="empty-state-desc">设置参数后点击"生成题目"开始</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === Gaps === -->
+            <div class="page" id="page-gaps">
+                <div id="gaps-container">
+                    <div class="empty-state">
+                        <div class="spinner"></div>
+                        <div class="empty-state-title">正在扫描...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === Plan === -->
+            <div class="page" id="page-plan">
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 16px; align-items: end;">
+                            <div>
+                                <label class="form-label">学习目标</label>
+                                <input type="text" class="input" id="plan-goal" placeholder="如：掌握 RAG 系统、深入理解 Transformer...">
+                            </div>
+                            <div>
+                                <label class="form-label">周期（天）</label>
+                                <select class="input" id="plan-days">
+                                    <option value="7">7 天</option>
+                                    <option value="14" selected>14 天</option>
+                                    <option value="21">21 天</option>
+                                    <option value="30">30 天</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="plan-generate-btn">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                生成计划
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="plan-container">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; stroke: var(--color-border);"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        <div class="empty-state-title">还没有学习计划</div>
+                        <div class="empty-state-desc">输入目标后点击"生成计划"</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === Notes === -->
+            <div class="page" id="page-notes">
+                <div class="note-actions">
+                    <div class="action-card">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        <div class="action-card-title">向量化同步</div>
+                        <div class="action-card-desc">将 Obsidian Vault 中的 Markdown 笔记索引到 ChromaDB，构建知识检索基础</div>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
+                            <input type="checkbox" id="sync-force">
+                            <label for="sync-force" style="font-size: 0.8125rem; color: var(--color-text-secondary);">强制全量同步</label>
+                        </div>
+                        <button class="btn btn-primary" id="sync-btn">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                            同步 Vault
+                        </button>
+                        <div id="sync-result"></div>
+                    </div>
+
+                    <div class="action-card">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/></svg>
+                        <div class="action-card-title">AI 整理笔记</div>
+                        <div class="action-card-desc">使用 AI 自动整理指定笔记的结构、标签和内容</div>
+                        <input type="text" class="input" id="organize-path" placeholder="笔记路径，如: 01-Notes/example.md" style="margin-bottom: 12px;">
+                        <button class="btn btn-primary" id="organize-btn">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/></svg>
+                            AI 整理
+                        </button>
+                        <div id="organize-result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- === Settings === -->
+            <!-- === Learning Center === -->
+            <div class="page" id="page-learning">
+                <!-- 统计卡片 -->
+                <div class="stats-grid" id="learning-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon teal">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="learn-total-notes">0</div>
+                            <div class="stat-label">总笔记数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon amber">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="learn-streak">0</div>
+                            <div class="stat-label">连续学习天数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="learn-total-tags">0</div>
+                            <div class="stat-label">学习主题数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="learn-total-sources">0</div>
+                            <div class="stat-label">学习来源数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 投递箱操作区 -->
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <span class="card-title">桌面投递箱</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" onclick="previewInbox()">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                预览
+                            </button>
+                            <button class="btn btn-primary" onclick="syncInbox()" id="btn-sync-inbox">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                扫描导入
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body" id="inbox-content">
+                        <p style="color: var(--color-text-secondary); font-size: 0.875rem;">点击「预览」查看待导入文件，点击「扫描导入」执行同步。</p>
+                        <p style="color: var(--color-text-tertiary); font-size: 0.8125rem; margin-top: 8px;">投递箱路径：~/Desktop/LearningInbox/</p>
+                    </div>
+                </div>
+
+                <!-- WorkBuddy 同步区 -->
+                <div class="card" style="margin-top: 16px;">
+                    <div class="card-header">
+                        <span class="card-title">WorkBuddy 空间同步</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" onclick="previewWorkBuddy()">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                预览
+                            </button>
+                            <button class="btn btn-primary" onclick="syncWorkBuddy()" id="btn-sync-workbuddy">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                全量同步
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body" id="workbuddy-content">
+                        <p style="color: var(--color-text-secondary); font-size: 0.875rem;">扫描所有 WorkBuddy 空间的 .workbuddy/memory/ 目录，将学习日志归档到 Vault。</p>
+                    </div>
+                </div>
+
+                <!-- 学习行为分析 -->
+                <div class="card" style="margin-top: 16px;">
+                    <div class="card-header">
+                        <span class="card-title">学习行为分析</span>
+                        <span style="font-size: 0.8125rem; color: var(--color-text-tertiary);">最近 30 天</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="learning-charts">
+                            <p style="color: var(--color-text-secondary); font-size: 0.875rem;">暂无学习数据，导入笔记后将自动生成统计。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近笔记 -->
+                <div class="card" style="margin-top: 16px;">
+                    <div class="card-header">
+                        <span class="card-title">最近笔记</span>
+                    </div>
+                    <div class="card-body" id="latest-notes">
+                        <p style="color: var(--color-text-secondary); font-size: 0.875rem;">暂无笔记</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page" id="page-settings">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-header">
+                        <span class="card-title">API 配置</span>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 16px;">
+                            <label class="form-label">API Key</label>
+                            <div class="input-group">
+                                <input type="text" class="input" id="settings-api-key" value="ak-hub-local-2026">
+                                <button class="btn btn-primary" onclick="saveApiKey()">保存</button>
+                            </div>
+                        </div>
+                        <div style="padding: 12px; background: var(--color-warning-light); border-radius: 8px; font-size: 0.8125rem; color: var(--color-warning);">
+                            API Key 保存在浏览器本地存储中，仅在当前设备生效。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="max-width: 600px; margin-top: 16px;">
+                    <div class="card-header">
+                        <span class="card-title">API 文档</span>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 12px;">
+                            访问 FastAPI 自动生成的交互式 API 文档：
+                        </p>
+                        <a href="/docs" target="_blank" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            Swagger UI
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/utils.js"></script>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

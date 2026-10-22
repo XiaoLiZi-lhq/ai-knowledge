@@ -12,6 +12,8 @@ from app.core.llm import llm_service
 from app.services.github_collector import github_collector
 from app.services.ai_tutor import quiz_generator, gap_scanner, plan_generator
 from app.services.note_organizer import note_organizer
+from app.services.workbuddy_sync import workbuddy_sync
+from app.services.inbox_scanner import inbox_scanner
 from app.integrations.wechat_bridge import wechat_router
 
 router = APIRouter(prefix="/api/v1")
@@ -53,6 +55,12 @@ class OrganizeRequest(BaseModel):
     note_path: str
 
 class SyncRequest(BaseModel):
+    force: bool = False
+
+class WorkBuddySyncRequest(BaseModel):
+    force: bool = False
+
+class InboxSyncRequest(BaseModel):
     force: bool = False
 
 class WeChatMessage(BaseModel):
@@ -153,6 +161,42 @@ async def notes_sync(req: SyncRequest, auth: bool = Depends(verify_api_key)):
 async def notes_organize(req: OrganizeRequest, auth: bool = Depends(verify_api_key)):
     """AI 整理笔记"""
     return note_organizer.organize(req.note_path)
+
+
+# ============ WorkBuddy 跨空间同步 ============
+
+@router.post("/sync/workbuddy")
+async def sync_workbuddy(req: WorkBuddySyncRequest, auth: bool = Depends(verify_api_key)):
+    """扫描所有 WorkBuddy 空间的学习记录并导入 Vault"""
+    return workbuddy_sync.sync(req.force)
+
+
+@router.get("/sync/workbuddy/preview")
+async def sync_workbuddy_preview(auth: bool = Depends(verify_api_key)):
+    """预览 WorkBuddy 空间待同步的文件"""
+    return workbuddy_sync.preview()
+
+
+# ============ 桌面投递箱 ============
+
+@router.post("/sync/inbox")
+async def sync_inbox(req: InboxSyncRequest, auth: bool = Depends(verify_api_key)):
+    """扫描桌面投递箱 ~/Desktop/LearningInbox/ 并导入笔记"""
+    return inbox_scanner.sync(req.force)
+
+
+@router.get("/sync/inbox/preview")
+async def sync_inbox_preview(auth: bool = Depends(verify_api_key)):
+    """预览投递箱中待导入的笔记"""
+    return inbox_scanner.preview()
+
+
+# ============ 学习行为统计 ============
+
+@router.get("/learning/stats")
+async def learning_stats(days: int = 30, auth: bool = Depends(verify_api_key)):
+    """获取学习行为统计（主题分布、来源分布、时间趋势、连续天数）"""
+    return inbox_scanner.learning_stats(days)
 
 
 # ============ 微信接口 ============

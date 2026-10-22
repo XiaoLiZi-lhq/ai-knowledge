@@ -5,8 +5,10 @@ AI Knowledge Hub - 主入口
 
 import asyncio
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from rich.console import Console
@@ -103,6 +105,7 @@ async def lifespan(app: FastAPI):
     console.print("[green]定时任务已启动 (GitHub收集: 08:00, Vault同步: 02:00)[/green]")
 
     console.print("\n[bold green]AI Knowledge Hub 已就绪[/bold green]")
+    console.print(f"[bold green]Web 界面: http://localhost:8000[/bold green]")
     console.print(f"[bold green]API 文档: http://localhost:8000/docs[/bold green]\n")
 
     yield
@@ -129,6 +132,19 @@ app.add_middleware(
 
 # 注册路由
 app.include_router(router)
+
+# 挂载静态文件
+import os
+static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    """Web 界面首页"""
+    index_path = os.path.join(static_dir, "index.html")
+    return FileResponse(index_path)
 
 
 if __name__ == "__main__":

@@ -65,28 +65,27 @@ tags: ["AI", "test"]
 class TestWeChatRouter:
     """微信路由测试"""
 
-    def test_help_command(self):
+    def test_help_command(self, monkeypatch):
         from app.integrations.wechat_bridge import WeChatRouter
+        monkeypatch.setattr(settings, "WECHAT_WHITE_LIST", [])
         router = WeChatRouter()
         reply = router.handle_message("/help", sender="test_user")
         assert "指令" in reply
 
-    def test_unauthorized(self):
+    def test_unauthorized(self, monkeypatch):
         from app.integrations.wechat_bridge import WeChatRouter
         router = WeChatRouter()
         # 白名单模式时非白名单用户应被拒
-        settings.WECHAT_WHITE_LIST = ["allowed_user"]
+        monkeypatch.setattr(settings, "WECHAT_WHITE_LIST", ["allowed_user"])
         reply = router.handle_message("hello", sender="blocked_user")
         assert "权限" in reply
-        settings.WECHAT_WHITE_LIST = []  # 恢复
 
-    def test_add_command(self):
+    def test_add_command(self, monkeypatch):
         from app.integrations.wechat_bridge import WeChatRouter
         router = WeChatRouter()
-        settings.WECHAT_WHITE_LIST = ["test_user"]
+        monkeypatch.setattr(settings, "WECHAT_WHITE_LIST", ["test_user"])
         reply = router.handle_message("/add 测试灵感", sender="test_user")
         assert "已记录" in reply or "Inbox" in reply
-        settings.WECHAT_WHITE_LIST = []
 
 
 class TestQuizGenerator:
