@@ -3,6 +3,9 @@ AI Knowledge Hub - RAG 管道
 自研三层漏斗检索：向量搜索 → BM25 重排 → 业务过滤
 """
 
+import hashlib
+import math
+
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 from typing import Optional
@@ -96,8 +99,9 @@ class RAGPipeline:
             except Exception:
                 continue
 
-            # 写入 ChromaDB
-            ids = [f"{md_file.stem}_{i}" for i in range(len(docs))]
+            # 写入 ChromaDB（ID 用文件路径哈希前缀，防止不同目录同名文件互相覆盖）
+            path_hash = hashlib.md5(file_key.encode()).hexdigest()[:8]
+            ids = [f"{path_hash}_{i}" for i in range(len(docs))]
             self.notes_collection.upsert(
                 ids=ids,
                 embeddings=embeddings,
@@ -134,24 +138,60 @@ class RAGPipeline:
                 "content": doc,
                 "metadata": results["metadatas"][0][i],
                 "distance": results["distances"][0][i],
-                "bm25_score": self._bm25_score(query, doc),
             })
 
-        # 第二层：BM25 重排
+        # 第二层：BM25 重排（jieba 分词，基于候选池局部 IDF）
+        self._bm25_rerank(query, candidates)
         candidates.sort(key=lambda x: x["bm25_score"] - x["distance"] * 0.3, reverse=True)
 
         # 第三层：过滤 + 取 Top-K
         filtered = [c for c in candidates if c["distance"] < 1.5]  # 相关性阈值
         return filtered[:top_k]
 
+    def _tokenize(self, text: str) -> list[str]:
+        """jieba 搜索引擎模式分词，过滤空白与标点"""
+        import jieba
+        return [t for t in jieba.cut_for_search(text.lower()) if t.strip()]
+
+    def _bm25_rerank(self, query: str, candidates: list[dict], k1: float = 1.5, b: float = 0.75) -> None:
+        """
+        对候选池做 BM25 打分（就地写入 bm25_score 字段）
+        IDF 从候选池内统计（局部 IDF），适配重排场景的小样本
+        """
+        query_terms = set(self._tokenize(query))
+        if not query_terms or not candidates:
+            for c in candidates:
+                c["bm25_score"] = 0.0
+            return
+
+        doc_tokens = [self._tokenize(c["content"]) for c in candidates]
+        N = len(candidates)
+        avgdl = sum(len(t) for t in doc_tokens) / N if N else 0.0
+
+        # 候选池内文档频率 → IDF
+        df = {}
+        for tokens in doc_tokens:
+            for term in set(tokens) & query_terms:
+                df[term] = df.get(term, 0) + 1
+
+        for c, tokens in zip(candidates, doc_tokens):
+            dl = len(tokens)
+            score = 0.0
+            for term in query_terms:
+                if term not in df:
+                    continue
+                tf = tokens.count(term)
+                if tf == 0:
+                    continue
+                idf = math.log(1 + (N - df[term] + 0.5) / (df[term] + 0.5))
+                score += idf * (tf * (k1 + 1)) / (tf + k1 * (1 - b + b * dl / avgdl))
+            c["bm25_score"] = score
+
     def _bm25_score(self, query: str, document: str) -> float:
-        """简化版 BM25 关键词匹配分数"""
-        query_terms = set(query.lower().split())
-        doc_terms = document.lower().split()
-        if not doc_terms:
-            return 0.0
-        matches = sum(1 for term in doc_terms if term in query_terms)
-        return matches / len(doc_terms) * 10
+        """单文档 BM25 分数（保留旧签名兼容，内部走 jieba 分词）"""
+        single = [{"content": document}]
+        self._bm25_rerank(query, single)
+        return single[0]["bm25_score"]
 
     def answer(self, query: str, history: list[dict] = None) -> dict:
         """

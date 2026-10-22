@@ -4,6 +4,7 @@ AI Knowledge Hub - 主入口
 """
 
 import asyncio
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -121,10 +122,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS（允许 Obsidian 插件和微信桥接服务跨域访问）
+# CORS（本地服务 + Obsidian 插件来源；支持 .env 扩展白名单）
+_extra_origins = [o.strip() for o in os.getenv("CORS_EXTRA_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "app://obsidian.md",   # Obsidian 插件
+    ] + _extra_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -134,7 +140,6 @@ app.add_middleware(
 app.include_router(router)
 
 # 挂载静态文件
-import os
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "static")
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")

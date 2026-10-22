@@ -97,6 +97,23 @@ async def chat(req: ChatRequest, auth: bool = Depends(verify_api_key)):
     return ChatResponse(answer=result["answer"], sources=result["sources"])
 
 
+@router.post("/chat/stream")
+async def chat_stream(req: ChatRequest, auth: bool = Depends(verify_api_key)):
+    """RAG 知识库问答（SSE 流式）— 本地 9B 模型生成慢，流式输出改善首字等待"""
+    import json
+    from fastapi.responses import StreamingResponse
+
+    def generate():
+        try:
+            for token in rag.answer_stream(req.query, req.history):
+                yield f"data: {json.dumps({'token': token}, ensure_ascii=False)}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'error': str(e)}, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
+
+
 # ============ AI 导师 ============
 
 @router.post("/quiz/generate")
