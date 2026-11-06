@@ -54,3 +54,30 @@ python -m uvicorn app.main:app --reload --port 8000
 - [ ] 填入微信 wxid（微信白名单）
 - [ ] 后续可尝试在好的网络环境下 `ollama pull nomic-embed-text`（替换本地嵌入引擎）
 - [ ] 配置 Obsidian Git 插件实现自动备份
+
+## 检索质量评测记录（scripts/eval_rag.py）
+
+**口径**：24 道真实 Java 面试题 → 按预期笔记标题匹配 top-5 检索结果；Hit@5 = 命中题目占比，MRR@5 = 预期笔记排名倒数的均值。**度量的是检索质量，不是回答准确率。**
+
+### 运行记录
+
+| 日期 | Hit@5 | MRR@5 | 未命中 | 环境 |
+|---|---|---|---|---|
+| 2026-10-22 | 95.8% (23/24) | 0.861 | TCP 三次握手 | Ollama nomic-embed-text（768 维） |
+| **2026-11-06** | **91.7% (22/24)** | **0.847** | TCP 三次握手；线程池核心参数 | Ollama nomic-embed-text（768 维），当前索引 |
+
+### 2026-11-06 运行明细（未命中分析）
+
+- ❌ **TCP 三次握手四次挥手**：知识库无计算机网络专题笔记（已知盲区，评测集故意保留以暴露盲区）；
+- ❌ **线程池的核心参数和工作流程**：`JavaSE-10多线程与反射` 未进 top-5——当前索引较 10 月新增了秒杀系统、七天速成等综合类笔记，召回池被非核心笔记挤占（改进方向：检索加 source/type 过滤或调大 BM25 权重）；
+- 其余 22 题命中，其中 19 题预期笔记排名 top-1。
+
+### 复现方式
+
+```bash
+source .venv/bin/activate
+python scripts/eval_rag.py            # 默认 top_k=5
+python scripts/eval_rag.py --topk 3   # 改 top-k
+```
+
+依赖：Ollama 运行中（`nomic-embed-text` + 生成模型）、`data/chroma` 索引已建立（路径来自 `.env` 的 `CHROMA_PERSIST_PATH`）。预期输出：逐题 ✅/❌ 明细 + 末尾两行 `Hit@5 / MRR@5` 汇总。
