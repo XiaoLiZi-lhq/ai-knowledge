@@ -15,9 +15,18 @@ venv/
 data/chroma/
 data/sqlite/
 data/inbox-processed/
+data/uploads/
+
+# 测试/工具缓存
+.pytest_cache/
+pytest-cache-files-*/
 
 # Obsidian Vault（不在项目仓库中）
 MyVault/
+vault/
+
+# 本地 Agent 团队状态（不入库）
+.agent-teams/
 
 # IDE
 .vscode/
@@ -32,5 +41,4 @@ Thumbs.db
 # 日志
 *.log
 logs/
-.tools/
 .tools/
